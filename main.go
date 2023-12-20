@@ -200,7 +200,9 @@ func GenerateSubKeys(key uint64) [16]uint64 {
 	return subkeys
 }
 
-// S-boxes for DES
+// S-boxes for DES 4x16 matrix
+// each element in the matrix corresponds to the value
+// to be substituted when given specific inputs
 var sBoxes = [8][4][16]int{
 	{
 		// S-box 1
