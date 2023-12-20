@@ -78,9 +78,9 @@ func main() {
 		fmt.Printf("Key Round %2d: 0x%012X\n", i+1, subkey)
 	}
 
-	// input block
+	// input data block
 	//inputBlock := uint64(0x0123456789ABCDEF)
-	inputBlock := uint64(0xAA238F292D2D04A1)
+	inputBlock := uint64(0x0000008080808000)
 
 	// Perform the initial permutation
 	result := InitialPermutation(inputBlock)
@@ -112,9 +112,29 @@ func OneRoundDES(data, key uint64) uint64 {
 	}
 
 	// XOR with round key
-	result := expandedData ^ key
+	xorResult := expandedData ^ key
 
-	// Example: Apply S-boxes and other operations here
+	// Apply the S-boxes
+	sBoxResult := uint64(0)
+	for i := 0; i < 8; i++ {
+		// Extract 6 bits from xorResult for each S-box
+		sixBits := (xorResult >> (42 - i*6)) & 0x3F
+		// Get the row and column from the six bits
+		row := ((sixBits >> 4) & 0x2) | (sixBits & 0x1)
+		col := (sixBits >> 1) & 0xF
+		// Look up the value in the S-box and append it to the result
+		sBoxResult |= uint64(sBoxes[i][row][col]) << (28 - i*4)
+	}
+
+	// Perform the P permutation
+	pPermutation := uint64(0)
+	for i := 0; i < 32; i++ {
+		bit := (sBoxResult >> (32 - i)) & 1
+		pPermutation |= (bit << (31 - i))
+	}
+
+	// XOR the result with the left half of the input data
+	result := data>>32 ^ pPermutation
 
 	return result
 }
@@ -178,4 +198,43 @@ func GenerateSubKeys(key uint64) [16]uint64 {
 		subkeys[i] = subkey
 	}
 	return subkeys
+}
+
+// S-boxes for DES
+var sBoxes = [8][4][16]int{
+	{
+		// S-box 1
+		{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+		{0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
+		{4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
+		{15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13},
+	},
+	{
+		// S-box 2
+		// Define S-box 2 here
+	},
+	{
+		// S-box 3
+		// Define S-box 3 here
+	},
+	{
+		// S-box 4
+		// Define S-box 4 here
+	},
+	{
+		// S-box 5
+		// Define S-box 5 here
+	},
+	{
+		// S-box 6
+		// Define S-box 6 here
+	},
+	{
+		// S-box 7
+		// Define S-box 7 here
+	},
+	{
+		// S-box 8
+		// Define S-box 8 here
+	},
 }
