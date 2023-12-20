@@ -64,12 +64,6 @@ var expansionTable = [48]int{
 	28, 29, 30, 31, 32, 1,
 }
 
-// Example round key (48 bits) for DES
-var roundKey uint64 = 0x0123456789ABCDEF
-
-// Sample data block (64 bits) for DES
-var dataBlock uint64 = 0x123456789ABCDEF0
-
 // Example 56-bit DES key
 var desKey uint64 = 0x133457799BBCDFF1
 
@@ -81,72 +75,32 @@ func main() {
 	fmt.Printf("Original Key: 0x%016X\n", desKey)
 	fmt.Println("Generated Subkeys:")
 	for i, subkey := range subkeys {
-		fmt.Printf("Round %2d: 0x%012X\n", i+1, subkey)
+		fmt.Printf("Key Round %2d: 0x%012X\n", i+1, subkey)
 	}
 
-	// Example input block
-	inputBlock := uint64(0x0123456789ABCDEF)
+	// input block
+	//inputBlock := uint64(0x0123456789ABCDEF)
+	inputBlock := uint64(0xAA238F292D2D04A1)
 
 	// Perform the initial permutation
 	result := InitialPermutation(inputBlock)
 
 	// Display the result in hexadecimal
 	fmt.Printf("Input Block:  0x%016X\n", inputBlock)
-	fmt.Printf("Permuted Block: 0x%016X\n", result)
+	fmt.Printf("Initial Permutated Block: 0x%016X\n", result)
 
-	// Perform one round of DES processing
-	outputBlock := OneRoundDES(dataBlock, roundKey)
-
-	fmt.Printf("Input Data Block:  0x%016X\n", dataBlock)
-	fmt.Printf("Round Key:          0x%016X\n", roundKey)
-	fmt.Printf("Output Data Block: 0x%016X\n", outputBlock)
-
-	// Example plaintext block (64 bits)
-	plaintext := uint64(0x0123456789ABCDEF)
-
-	// Perform DES encryption
-	ciphertext := EncryptDES(plaintext, desKey)
-
-	fmt.Printf("Plaintext: 0x%016X\n", plaintext)
-	fmt.Printf("Ciphertext: 0x%016X\n", ciphertext)
-
-	// Example input block
-	inputBlock = uint64(0x0123456789ABCDEF)
+	for i, subkey := range subkeys {
+		result = OneRoundDES(result, subkey)
+		fmt.Printf("DES Round %2d: 0x%012X\n", i+1, result)
+	}
 
 	// Perform the final permutation
-	result = FinalPermutation(inputBlock)
+	result = FinalPermutation(result)
 
 	// Display the result in hexadecimal
 	fmt.Printf("Input Block:  0x%016X\n", inputBlock)
-	fmt.Printf("Permuted Block: 0x%016X\n", result)
+	fmt.Printf("Final Permutated Block: 0x%016X\n", result)
 
-}
-
-func initialPermutation(input string) uint64 {
-	inputBlock := uint64(0x0123456789ABCDEF)
-
-	// Perform the initial permutation
-	result := InitialPermutation(inputBlock)
-
-	// Display the result in hexadecimal
-	fmt.Printf("Input Block:  0x%016X\n", inputBlock)
-	fmt.Printf("Permuted Block: 0x%016X\n", result)
-
-	return result
-}
-
-func finalPermutation(input string) uint64 {
-	// Example input block
-	inputBlock := uint64(0x0123456789ABCDEF)
-
-	// Perform the final permutation
-	result := FinalPermutation(inputBlock)
-
-	// Display the result in hexadecimal
-	fmt.Printf("Input Block:  0x%016X\n", inputBlock)
-	fmt.Printf("Permuted Block: 0x%016X\n", result)
-
-	return result
 }
 
 func OneRoundDES(data, key uint64) uint64 {
@@ -164,28 +118,6 @@ func OneRoundDES(data, key uint64) uint64 {
 
 	return result
 }
-
-func EncryptDES(plaintext, key uint64) uint64 {
-	// Generate subkeys
-	subkeys := GenerateSubKeys(key)
-
-	// Initial permutation
-	ciphertext := InitialPermutation(plaintext)
-
-	// Perform 16 rounds of DES
-	for i := 0; i < 16; i++ {
-		ciphertext = OneRoundDES(ciphertext, subkeys[i])
-	}
-
-	// Final permutation
-	ciphertext = FinalPermutation(ciphertext)
-
-	return ciphertext
-}
-
-//func decrypt(ciphertext string, key string) string {
-// DES decryption process
-//}
 
 // Permutation table for key permutation choice 1 (PC1)
 var pc1Table = [56]int{
