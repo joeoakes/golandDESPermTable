@@ -1,9 +1,7 @@
 package main
 
 import (
-	"crypto/cipher"
 	"crypto/des"
-	"encoding/hex"
 	"fmt"
 )
 
@@ -18,8 +16,9 @@ func main() {
 		panic(err)
 	}
 
-	// Initial Permutation (IP) table
-	ipTable := [64]byte{
+	// Initialize permutation tables
+	initialPermutationTable := []byte{
+		// Initial permutation table (IP)
 		58, 50, 42, 34, 26, 18, 10, 2,
 		60, 52, 44, 36, 28, 20, 12, 4,
 		62, 54, 46, 38, 30, 22, 14, 6,
@@ -30,25 +29,50 @@ func main() {
 		63, 55, 47, 39, 31, 23, 15, 7,
 	}
 
-	// Permute the plaintext using the initial permutation (IP) table
-	initialPermutation(plaintext, ipTable)
+	finalPermutationTable := []byte{
+		// Final permutation table (IP-1)
+		40, 8, 48, 16, 56, 24, 64, 32,
+		39, 7, 47, 15, 55, 23, 63, 31,
+		38, 6, 46, 14, 54, 22, 62, 30,
+		37, 5, 45, 13, 53, 21, 61, 29,
+		36, 4, 44, 12, 52, 20, 60, 28,
+		35, 3, 43, 11, 51, 19, 59, 27,
+		34, 2, 42, 10, 50, 18, 58, 26,
+		33, 1, 41, 9, 49, 17, 57, 25,
+	}
 
-	// Create an initialization vector (IV) for Cipher Block Chaining (CBC) mode
-	iv := make([]byte, block.BlockSize())
+	// Initial permutation
+	initialPermutation(plaintext, initialPermutationTable)
 
-	// Create a CBC mode encrypter
-	encrypter := cipher.NewCBCEncrypter(block, iv)
+	// Perform multiple rounds (DES typically uses 16 rounds)
+	rounds := 16
+	for round := 0; round < rounds; round++ {
+		// Implement DES round operations here
+		// You'll need to perform expansion, substitution, permutation, and XOR operations
+		// Update the block of data in each round
+	}
 
-	// Encrypt the plaintext
-	ciphertext := make([]byte, len(plaintext))
-	encrypter.CryptBlocks(ciphertext, plaintext)
+	// Final permutation
+	finalPermutation(plaintext, finalPermutationTable)
 
-	// Print the ciphertext as hex
-	fmt.Printf("Ciphertext (hex): %s\n", hex.EncodeToString(ciphertext))
+	// Print the ciphertext
+	ciphertext := make([]byte, block.BlockSize())
+	block.Encrypt(ciphertext, plaintext)
+
+	fmt.Printf("Ciphertext (hex): %x\n", ciphertext)
 }
 
-// initialPermutation permutes the input data according to the given permutation table
-func initialPermutation(data []byte, table [64]byte) {
+// initialPermutation permutes the input data according to the initial permutation (IP) table
+func initialPermutation(data []byte, table []byte) {
+	result := make([]byte, len(data))
+	for i, bit := range table {
+		result[i] = data[bit-1]
+	}
+	copy(data, result)
+}
+
+// finalPermutation permutes the input data according to the final permutation (IP-1) table
+func finalPermutation(data []byte, table []byte) {
 	result := make([]byte, len(data))
 	for i, bit := range table {
 		result[i] = data[bit-1]
