@@ -69,6 +69,8 @@ var desKey uint64 = 0x133457799BBCDFF1
 
 func main() {
 
+	desKey := reverseKeyUint64(desKey)
+
 	// Generate the 16 subkeys from the DES key
 	subkeys := GenerateSubKeys(desKey)
 
@@ -79,8 +81,8 @@ func main() {
 	}
 
 	// input data block
-	inputBlock := uint64(0x0123456789ABCDEF)
-	//inputBlock := uint64(0xA88028A888800820)
+	//inputBlock := uint64(0x0123456789ABCDEF)
+	inputBlock := uint64(0xA88028A888800820)
 
 	// Perform the initial permutation
 	result := InitialPermutation(inputBlock)
@@ -198,6 +200,16 @@ func GenerateSubKeys(key uint64) [16]uint64 {
 		subkeys[i] = subkey
 	}
 	return subkeys
+}
+
+// The bit manipulation is done using bitwise shift and bitwise OR operations.
+func reverseKeyUint64(key uint64) uint64 {
+	var reversedKey uint64
+	for i := 0; i < 64; i++ {
+		bit := (key >> i) & 1
+		reversedKey |= bit << (63 - i)
+	}
+	return reversedKey
 }
 
 // S-boxes for DES 4x16 matrix
