@@ -69,10 +69,10 @@ var desKey uint64 = 0x133457799BBCDFF1
 
 func main() {
 
-	desKey := reverseKeyUint64(desKey)
+	//desKey := reverseKeyUint64(desKey)
 
 	// Generate the 16 subkeys from the DES key
-	//subkeys := GenerateSubKeys(desKey)
+	subkeys := GenerateSubKeys(desKey)
 
 	fmt.Printf("Original Key: 0x%016X\n", desKey)
 	fmt.Println("Generated Subkeys:")
