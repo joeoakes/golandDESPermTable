@@ -72,7 +72,7 @@ func main() {
 	desKey := reverseKeyUint64(desKey)
 
 	// Generate the 16 subkeys from the DES key
-	subkeys := GenerateSubKeys(desKey)
+	//subkeys := GenerateSubKeys(desKey)
 
 	fmt.Printf("Original Key: 0x%016X\n", desKey)
 	fmt.Println("Generated Subkeys:")
@@ -81,8 +81,8 @@ func main() {
 	}
 
 	// input data block
-	//inputBlock := uint64(0x0123456789ABCDEF)
-	inputBlock := uint64(0xA88028A888800820)
+	inputBlock := uint64(0x0123456789ABCDEF)
+	//inputBlock := uint64(0xA88028A888800820)
 
 	// Perform the initial permutation
 	result := InitialPermutation(inputBlock)
@@ -91,6 +91,7 @@ func main() {
 	fmt.Printf("Input Block:  0x%016X\n", inputBlock)
 	fmt.Printf("Initial Permutated Block: 0x%016X\n", result)
 
+	// Perform this operation 16 times
 	for i, subkey := range subkeys {
 		result = OneRoundDES(result, subkey)
 		fmt.Printf("DES Round %2d: 0x%012X\n", i+1, result)
